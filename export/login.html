@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Billiard POS - Login Sistem</title>
+  
+  <!-- CSS Dependencies -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-950 min-vh-screen d-flex align-items-center justify-content-center px-3">
+
+  <div class="card-glass p-5 text-center" style="max-width: 440px; width: 100%;">
+    <div class="w-16 h-16 rounded-3xl bg-gradient-to-br from-emerald-500 to-teal-500 text-slate-950 font-black flex items-center justify-center shadow-lg shadow-emerald-500/10 mx-auto mb-4 border border-emerald-500/20" style="width: 64px; height: 64px; font-size: 28px; line-height: 64px;">
+      <span>8</span>
+    </div>
+    <h3 class="text-white font-black tracking-tight mb-1">B8 Billiard POS</h3>
+    <p class="text-xs text-muted mb-4">Pencatatan Sewa Meja & Pembukuan Keuangan Terintegrasi Google Spreadsheet</p>
+
+    <!-- Error/Success Alerts container -->
+    <div id="alert-container"></div>
+
+    <form id="login-form-independent" class="text-start">
+      <div class="mb-3">
+        <label class="form-label text-[10px] font-bold text-muted uppercase tracking-wider">Username</label>
+        <div class="position-relative">
+          <span class="position-absolute top-50 start-0 translate-middle-y ps-3 text-slate-500"><i class="fa fa-user text-xs"></i></span>
+          <input type="text" id="login-user" required class="form-control ps-5" placeholder="e.g., admin / kasir">
+        </div>
+      </div>
+      <div class="mb-4">
+        <label class="form-label text-[10px] font-bold text-muted uppercase tracking-wider">Password</label>
+        <div class="position-relative">
+          <span class="position-absolute top-50 start-0 translate-middle-y ps-3 text-slate-500"><i class="fa fa-lock text-xs"></i></span>
+          <input type="password" id="login-pass" required class="form-control ps-5" placeholder="Masukkan password">
+        </div>
+      </div>
+      <button type="submit" class="btn btn-emerald w-100 py-3 font-bold text-xs uppercase tracking-wider text-slate-950 cursor-pointer" style="background-color: #10b981; border: none;">
+        Masuk Konsol
+      </button>
+    </form>
+
+    <div class="mt-4 pt-3 border-top border-slate-800 text-[10px] text-slate-500">
+      <p class="mb-1"><strong>Default Admin Credentials:</strong> admin / admin123</p>
+      <p class="m-0"><strong>Default Cashier Credentials:</strong> kasir / kasir123</p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.getElementById("login-form-independent").onsubmit = function(e) {
+      e.preventDefault();
+      const user = document.getElementById("login-user").value.trim().toLowerCase();
+      const pass = document.getElementById("login-pass").value;
+      const alertCont = document.getElementById("alert-container");
+
+      if ((user === "admin" && pass === "admin123") || (user === "kasir" && pass === "kasir123")) {
+        alertCont.innerHTML = `
+          <div class="alert alert-success border-0 text-xs py-2 px-3 mb-3" style="background-color: rgba(16,185,129,0.1); color: #34d399;">
+            Login Sukses! Mengalihkan ke sistem...
+          </div>
+        `;
+        setTimeout(() => {
+          window.location.href = "index.html";
+        }, 1200);
+      } else {
+        alertCont.innerHTML = `
+          <div class="alert alert-danger border-0 text-xs py-2 px-3 mb-3" style="background-color: rgba(244,63,94,0.1); color: #fb7185;">
+            Username atau password salah!
+          </div>
+        `;
+      }
+    };
+  </script>
+</body>
+</html>

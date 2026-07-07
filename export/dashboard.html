@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Billiard POS - Dashboard</title>
+  
+  <!-- CSS Dependencies -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-950 p-4 p-md-5">
+
+  <div class="container">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h1 class="text-2xl font-bold text-white tracking-tight">Overview Dashboard</h1>
+        <p class="text-slate-400 text-sm m-0">Statistik real-time keuangan dan pemakaian meja billiard.</p>
+      </div>
+      <a href="index.html" class="btn btn-outline-secondary btn-sm text-xs rounded-xl font-bold py-2 px-3 border-slate-800 text-slate-300">
+        <i class="fa fa-arrow-left me-1"></i> Kembali ke Portal
+      </a>
+    </div>
+
+    <!-- Stat cards grid -->
+    <div class="row g-3 mb-4">
+      <div class="col-12 col-md-4">
+        <div class="card-glass p-4 d-flex justify-content-between align-items-center">
+          <div>
+            <span class="text-[10px] text-muted font-bold uppercase tracking-wider block">Pendapatan Hari Ini</span>
+            <h3 class="text-white font-monospace font-black mt-1 mb-0 text-emerald-400">Rp 1.450.000</h3>
+            <span class="text-[10px] text-emerald-500 font-bold mt-1 block"><i class="fa fa-caret-up"></i> +12% dari kemarin</span>
+          </div>
+          <i class="fa fa-wallet text-3xl text-emerald-400 opacity-80"></i>
+        </div>
+      </div>
+      <div class="col-12 col-md-4">
+        <div class="card-glass p-4 d-flex justify-content-between align-items-center">
+          <div>
+            <span class="text-[10px] text-muted font-bold uppercase tracking-wider block">Pendapatan Bulan Ini</span>
+            <h3 class="text-white font-monospace font-black mt-1 mb-0 text-indigo-400">Rp 42.800.000</h3>
+            <span class="text-[10px] text-indigo-400 font-bold mt-1 block"><i class="fa fa-bullseye"></i> 85% dari target</span>
+          </div>
+          <i class="fa fa-chart-line text-3xl text-indigo-400 opacity-80"></i>
+        </div>
+      </div>
+      <div class="col-12 col-md-4">
+        <div class="card-glass p-4 d-flex justify-content-between align-items-center">
+          <div>
+            <span class="text-[10px] text-muted font-bold uppercase tracking-wider block">Total Booking Meja</span>
+            <h3 class="text-white font-monospace font-black mt-1 mb-0 text-amber-400">188 Booking</h3>
+            <span class="text-[10px] text-amber-400 font-bold mt-1 block"><i class="fa fa-star"></i> Meja 2 terfavorit</span>
+          </div>
+          <i class="fa fa-ticket text-3xl text-amber-400 opacity-80"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart row -->
+    <div class="row g-4 mb-4">
+      <div class="col-12 col-lg-8">
+        <div class="card-glass p-4">
+          <h6 class="text-xs font-bold text-white uppercase tracking-wider mb-3">Tren Pendapatan Mingguan (Meja vs Kafe)</h6>
+          <div class="chart-container">
+            <canvas id="weeklyChart"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-lg-4">
+        <div class="card-glass p-4">
+          <h6 class="text-xs font-bold text-white uppercase tracking-wider mb-3">Metode Pembayaran Terbanyak</h6>
+          <div class="chart-container">
+            <canvas id="paymentChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live occupancy warning -->
+    <div class="card-glass p-4 bg-emerald-500/5 border-emerald-500/10">
+      <div class="d-flex gap-3 align-items-start">
+        <div class="p-2 bg-emerald-500/10 text-emerald-400 rounded-lg"><i class="fa fa-lightbulb"></i></div>
+        <div>
+          <h6 class="text-white font-bold mb-1">Optimalkan Jam Sibuk (Peak Hours)</h6>
+          <p class="text-xs text-slate-400 m-0 leading-relaxed">
+            Berdasarkan riwayat transaksi, jam ramai billiard terjadi pada pukul 19:00 - 23:00 WIB di akhir pekan. Pertimbangkan untuk menerapkan tarif VIP atau promosi khusus paket snack di jam tersebut guna mendongkrak penjualan F&B kafe Anda.
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Chart.js configuration scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // Weekly sales trends
+    const ctxWeekly = document.getElementById('weeklyChart').getContext('2d');
+    new Chart(ctxWeekly, {
+      type: 'bar',
+      data: {
+        labels: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'],
+        datasets: [
+          {
+            label: 'Sewa Meja Billiard',
+            data: [400000, 350000, 450000, 500000, 800000, 1200000, 1100000],
+            backgroundColor: 'rgba(16, 185, 129, 0.65)',
+            borderColor: '#10b981',
+            borderWidth: 1
+          },
+          {
+            label: 'Penjualan Makanan & Minuman Kafe',
+            data: [150000, 120000, 180000, 200000, 350000, 600000, 550000],
+            backgroundColor: 'rgba(99, 102, 241, 0.65)',
+            borderColor: '#6366f1',
+            borderWidth: 1
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { labels: { color: '#94a3b8', font: { size: 10, weight: 'bold' } } }
+        },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 9 } } },
+          y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#94a3b8', font: { size: 9 } } }
+        }
+      }
+    });
+
+    // Payment methods pie chart
+    const ctxPayment = document.getElementById('paymentChart').getContext('2d');
+    new Chart(ctxPayment, {
+      type: 'doughnut',
+      data: {
+        labels: ['Tunai (Cash)', 'QRIS (E-Wallet)', 'Transfer Bank', 'Debit Card'],
+        datasets: [{
+          data: [55, 30, 10, 5],
+          backgroundColor: ['#10b981', '#6366f1', '#fbbf24', '#f43f5e'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 10 } } }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

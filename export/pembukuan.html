@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Billiard POS - Pembukuan & Laba Rugi</title>
+  
+  <!-- CSS Dependencies -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-950 p-4 p-md-5">
+
+  <div class="container">
+    
+    <!-- Top banner -->
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom border-slate-800 pb-3">
+      <div>
+        <h1 class="text-2xl font-bold text-white tracking-tight">Pembukuan & Laba Rugi</h1>
+        <p class="text-slate-400 text-sm m-0">Kelola arus pengeluaran operasional dan pantau laba operasional bersih.</p>
+      </div>
+      <a href="index.html" class="btn btn-outline-secondary btn-sm text-xs rounded-xl font-bold py-2 px-3 border-slate-800 text-slate-300">
+        <i class="fa fa-arrow-left me-1"></i> Kembali ke Portal
+      </a>
+    </div>
+
+    <!-- Income Statement Sheet mockup -->
+    <div class="card-glass p-4 mb-4">
+      <h5 class="text-xs font-bold text-emerald-400 uppercase tracking-widest border-b border-slate-800 pb-2 mb-3">
+        Laporan Laba Rugi Sederhana (Juli 2026)
+      </h5>
+      
+      <div class="row g-3">
+        <div class="col-12 col-md-6">
+          <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 space-y-2 text-xs">
+            <span class="text-[10px] text-muted font-bold uppercase block">Total Pemasukan Kotor (Omzet)</span>
+            <div class="d-flex justify-content-between">
+              <span>Pendapatan Sewa Meja:</span>
+              <strong class="text-white">Rp 28.500.000</strong>
+            </div>
+            <div class="d-flex justify-content-between">
+              <span>Pendapatan Penjualan Kafe:</span>
+              <strong class="text-white">Rp 14.300.000</strong>
+            </div>
+            <div class="d-flex justify-content-between border-top border-slate-800 pt-2 font-bold text-sm">
+              <span class="text-emerald-400">Total Omzet Kotor:</span>
+              <span class="text-emerald-400">Rp 42.800.000</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-md-6">
+          <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 space-y-2 text-xs">
+            <span class="text-[10px] text-muted font-bold uppercase block">Total Pengeluaran Operasional</span>
+            <div class="d-flex justify-content-between">
+              <span>Gaji Karyawan Kasir:</span>
+              <strong class="text-white">Rp 2.500.000</strong>
+            </div>
+            <div class="d-flex justify-content-between">
+              <span>Tagihan Listrik PLN:</span>
+              <strong class="text-white">Rp 850.000</strong>
+            </div>
+            <div class="d-flex justify-content-between">
+              <span>Internet & Wifi:</span>
+              <strong class="text-white">Rp 350.000</strong>
+            </div>
+            <div class="d-flex justify-content-between border-top border-slate-800 pt-2 font-bold text-sm">
+              <span class="text-rose-400">Total Pengeluaran:</span>
+              <span class="text-rose-400">Rp 3.700.000</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-emerald-500/10 p-3 rounded-xl border border-emerald-500/20 d-flex justify-content-between align-items-center mt-3 text-sm font-bold">
+        <span class="text-emerald-400 uppercase tracking-wider text-xs">Estimasi Laba Bersih Operasional (Net Profit):</span>
+        <span class="text-emerald-400 font-monospace text-lg">Rp 39.100.000</span>
+      </div>
+    </div>
+
+    <!-- Expense table mockup -->
+    <div class="card-glass overflow-hidden shadow">
+      <div class="p-4 border-b border-slate-800 bg-slate-900/40 d-flex justify-content-between align-items-center">
+        <h6 class="text-sm font-bold text-white m-0"><i class="fa fa-list text-emerald-400 me-2"></i> Pengeluaran Operasional Toko</h6>
+        <button class="btn btn-sm btn-emerald text-slate-950 font-bold text-xs px-3" onclick="alert('Buka menu Pembukuan Kas di index.html untuk menginput secara interaktif!')">
+          + Catat Pengeluaran
+        </button>
+      </div>
+      
+      <div class="table-responsive">
+        <table class="table text-left">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Tanggal</th>
+              <th>Kategori</th>
+              <th>Catatan / Keterangan</th>
+              <th class="text-end">Jumlah Pengeluaran</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="font-monospace text-slate-500">#E1</td>
+              <td class="font-monospace">2026-07-01</td>
+              <td><span class="badge bg-slate-900 border border-slate-800 text-slate-300">Gaji Karyawan</span></td>
+              <td>Gaji Kasir Roni bulan Juli</td>
+              <td class="text-end font-monospace font-bold text-rose-400">Rp 2.500.000</td>
+            </tr>
+            <tr>
+              <td class="font-monospace text-slate-500">#E2</td>
+              <td class="font-monospace">2026-07-02</td>
+              <td><span class="badge bg-slate-900 border border-slate-800 text-slate-300">Biaya Listrik</span></td>
+              <td>Tagihan listrik PLN Juli</td>
+              <td class="text-end font-monospace font-bold text-rose-400">Rp 850.000</td>
+            </tr>
+            <tr>
+              <td class="font-monospace text-slate-500">#E3</td>
+              <td class="font-monospace">2026-07-03</td>
+              <td><span class="badge bg-slate-900 border border-slate-800 text-slate-300">Biaya Internet</span></td>
+              <td>Tagihan Wifi Biznet</td>
+              <td class="text-end font-monospace font-bold text-rose-400">Rp 350.000</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Billiard POS & Accounting - System Portal</title>
+  
+  <!-- CSS Dependencies -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-950">
+
+  <!-- ==========================================
+       LOGIN VIEW SECTION
+       ========================================== -->
+  <section id="login-section" class="view-section min-vh-screen d-flex align-items-center justify-content-center bg-slate-950 px-3">
+    <div class="card-glass p-5 text-center" style="max-width: 440px; width: 100%;">
+      <div class="w-16 h-16 rounded-3xl bg-gradient-to-br from-emerald-500 to-teal-500 text-slate-950 font-black flex items-center justify-center shadow-lg shadow-emerald-500/10 mx-auto mb-4 border border-emerald-500/20" style="width: 64px; height: 64px; font-size: 28px;">
+        <span>8</span>
+      </div>
+      <h3 class="text-white font-black tracking-tight mb-1">B8 Billiard POS</h3>
+      <p class="text-xs text-muted mb-4">Sistem Billing Meja Billiard & Pembukuan Keuangan Terintegrasi Spreadsheet</p>
+
+      <form id="login-form" class="text-start">
+        <div class="mb-3">
+          <label class="form-label text-[10px] font-bold text-muted uppercase tracking-wider">Username</label>
+          <div class="position-relative">
+            <span class="position-absolute top-50 start-0 translate-middle-y ps-3 text-slate-500"><i class="fa fa-user text-xs"></i></span>
+            <input type="text" id="login-username" required class="form-control ps-5" placeholder="e.g., admin atau kasir">
+          </div>
+        </div>
+        <div class="mb-4">
+          <label class="form-label text-[10px] font-bold text-muted uppercase tracking-wider">Password</label>
+          <div class="position-relative">
+            <span class="position-absolute top-50 start-0 translate-middle-y ps-3 text-slate-500"><i class="fa fa-lock text-xs"></i></span>
+            <input type="password" id="login-password" required class="form-control ps-5" placeholder="Masukkan password">
+          </div>
+        </div>
+        <button type="submit" class="btn btn-emerald w-100 py-3 font-bold text-xs uppercase tracking-wider text-slate-950 cursor-pointer" style="background-color: #10b981; border: none;">
+          Masuk Sistem
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       MAIN DASHBOARD SYSTEM LAYOUT
+       ========================================== -->
+  <section id="main-system-layout" class="view-section d-none">
+    
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar">
+      <div>
+        <div class="p-4 border-bottom border-slate-800 d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 text-slate-950 font-black flex items-center justify-center shadow-lg border border-emerald-500/20" style="width: 40px; height: 40px;">
+              <span class="fs-5">8</span>
+            </div>
+            <div>
+              <h6 class="font-extrabold text-white m-0 tracking-tight" style="font-size: 14px;">B8 Billiard</h6>
+              <span class="text-[9px] text-emerald-400 font-mono font-bold uppercase mt-1 d-inline-block">Pro POS</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar link items -->
+        <nav class="p-3">
+          <button onclick="switchView('dashboard')" data-view="dashboard" class="nav-link w-100 border-0 text-start active"><i class="fa fa-chart-line"></i><span>Dashboard</span></button>
+          <button onclick="switchView('transaksi')" data-view="transaksi" class="nav-link w-100 border-0 text-start"><i class="fa fa-play-circle"></i><span>Billing & POS</span></button>
+          <button onclick="switchView('meja')" data-view="meja" class="nav-link w-100 border-0 text-start"><i class="fa fa-layer-group"></i><span>Master Meja</span></button>
+          <button onclick="switchView('produk')" data-view="produk" class="nav-link w-100 border-0 text-start"><i class="fa fa-shopping-bag"></i><span>Master Produk</span></button>
+          <button onclick="switchView('pembukuan')" data-view="pembukuan" class="nav-link w-100 border-0 text-start"><i class="fa fa-book-open"></i><span>Pembukuan Kas</span></button>
+          <button onclick="switchView('laporan')" data-view="laporan" class="nav-link w-100 border-0 text-start"><i class="fa fa-file-invoice-dollar"></i><span>Laporan & Riwayat</span></button>
+          <button onclick="switchView('logs')" data-view="logs" class="nav-link w-100 border-0 text-start"><i class="fa fa-shield-halved"></i><span>Audit Log</span></button>
+          <button onclick="switchView('settings')" data-view="settings" class="nav-link w-100 border-0 text-start"><i class="fa fa-cog"></i><span>Pengaturan</span></button>
+        </nav>
+      </div>
+
+      <!-- Sidebar footer user badge -->
+      <div class="p-3 border-top border-slate-800 bg-slate-900/40">
+        <div class="d-flex align-items-center justify-content-between p-2.5 bg-slate-950/60 rounded border border-slate-800">
+          <div class="d-flex align-items-center gap-2 truncate">
+            <div class="w-8 h-8 rounded-circle bg-emerald-500/10 text-emerald-400 d-flex align-items-center justify-content-center font-bold" style="width: 32px; height: 32px;" id="user-avatar-badge">A</div>
+            <div class="truncate leading-tight">
+              <p class="text-xs font-extrabold text-white m-0 truncate" id="session-display-name">Administrator</p>
+              <span class="text-[9px] font-bold text-slate-500 uppercase m-0" id="session-display-role">Admin</span>
+            </div>
+          </div>
+          <button onclick="logoutUser()" class="btn btn-sm btn-link text-slate-500 hover:text-rose-400 p-1 cursor-pointer" title="Keluar Akun">
+            <i class="fa fa-sign-out-alt"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- RIGHT MAIN CANVAS WRAPPER -->
+    <div class="main-content">
+      
+      <!-- Top header bar -->
+      <header class="top-navbar">
+        <div class="d-flex align-items-center gap-3">
+          <button class="btn btn-dark d-lg-none p-1.5 rounded" onclick="toggleMobileSidebar()"><i class="fa fa-bars"></i></button>
+          <div>
+            <h5 class="text-white font-extrabold m-0" id="header-billiard-name">Arena Billiard & Lounge</h5>
+            <p class="text-[9px] text-slate-500 m-0" id="header-billiard-address">Jl. Raya Billiard No. 88, Jakarta Selatan</p>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-4 text-xs">
+          <!-- Live Realtime Clock -->
+          <div class="d-flex align-items-center gap-1.5 text-slate-400 font-monospace">
+            <i class="fa fa-clock text-emerald-400"></i>
+            <span id="realtime-clock">12:00:00 WIB</span>
+          </div>
+
+          <!-- Network indicators -->
+          <span class="status-badge badge-kosong text-[9px]" id="database-sync-badge">Sheets API</span>
+        </div>
+      </header>
+
+      <!-- Dynamic viewport panel padding -->
+      <main class="flex-1 p-4 p-md-5">
+
+        <!-- ==========================================
+             VIEW 1: DASHBOARD PANEL
+             ========================================== -->
+        <div id="dashboard-view" class="view-section container-fluid">
+          <div class="mb-4">
+            <h1 class="text-2xl font-bold text-white tracking-tight">Overview Dashboard</h1>
+            <p class="text-slate-400 text-sm m-0">Ringkasan harian performa finansial dan pemakaian billiard.</p>
+          </div>
+
+          <!-- Statistics Row Grid -->
+          <div class="row g-3 mb-4">
+            <div class="col-12 col-sm-6 col-lg-3">
+              <div class="card-glass p-4 d-flex justify-content-between align-items-center">
+                <div>
+                  <span class="text-[10px] text-muted font-bold uppercase tracking-wider block">Pendapatan Hari Ini</span>
+                  <h3 class="text-white font-monospace font-black mt-1 mb-0 text-emerald-400" id="stat-revenue-today">Rp 0</h3>
+                </div>
+                <i class="fa fa-wallet text-3xl text-emerald-400"></i>
+              </div>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-3">
+              <div class="card-glass p-4 d-flex justify-content-between align-items-center">
+                <div>
+                  <span class="text-[10px] text-muted font-bold uppercase tracking-wider block">Pendapatan Bulan Ini</span>
+                  <h3 class="text-white font-monospace font-black mt-1 mb-0" id="stat-revenue-month">Rp 0</h3>
+                </div>
+                <i class="fa fa-chart-line text-3xl text-indigo-400"></i>
+              </div>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-3">
+              <div class="card-glass p-4 d-flex justify-content-between align-items-center">
+                <div>
+                  <span class="text-[10px] text-muted font-bold uppercase tracking-wider block">Transaksi Selesai</span>
+                  <h3 class="text-white font-monospace font-black mt-1 mb-0 text-amber-400" id="stat-tx-today">0</h3>
+                </div>
+                <i class="fa fa-receipt text-3xl text-amber-400"></i>
+              </div>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-3">
+              <div class="card-glass p-4 d-flex justify-content-between align-items-center">
+                <div>
+                  <span class="text-[10px] text-muted font-bold uppercase tracking-wider block">Kunjungan (Pemain)</span>
+                  <h3 class="text-white font-monospace font-black mt-1 mb-0 text-rose-400" id="stat-customers-today">0</h3>
+                </div>
+                <i class="fa fa-users text-3xl text-rose-400"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-4 mb-4">
+            <!-- Active Table counters -->
+            <div class="col-12 col-md-4">
+              <div class="card-glass p-4 text-center">
+                <h6 class="text-[10px] text-muted uppercase font-bold tracking-wider mb-2">Okupansi Meja</h6>
+                <div class="d-flex justify-content-around align-items-center py-2">
+                  <div>
+                    <h2 class="text-white font-black m-0 text-danger" id="stat-tables-used">0</h2>
+                    <span class="text-[9px] text-muted font-bold uppercase">Dipakai</span>
+                  </div>
+                  <div class="border-end border-slate-800" style="height: 40px;"></div>
+                  <div>
+                    <h2 class="text-white font-black m-0 text-emerald-400" id="stat-tables-empty">0</h2>
+                    <span class="text-[9px] text-muted font-bold uppercase">Kosong</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Promotion banner / alert info -->
+            <div class="col-12 col-md-8">
+              <div class="card-glass p-4 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border-emerald-500/10">
+                <h5 class="text-white font-bold mb-1">Informasi Sinkronisasi Database</h5>
+                <p class="text-xs text-slate-400 mb-0 leading-relaxed">
+                  Semua transaksi yang diselesaikan oleh kasir terdaftar langsung ke spreadsheet Anda. Pastikan status indikator "Sheets API" berwarna hijau menyala di kanan atas untuk mengonfirmasi bahwa data sinkronisasi aman dari kehilangan cache.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Monitor Meja billiard realtime grid -->
+          <h5 class="text-xs font-bold uppercase text-muted tracking-wider mb-3">Monitor Pemakaian Meja Realtime</h5>
+          <div class="row g-3" id="dashboard-tables-grid"></div>
+
+        </div>
+
+        <!-- ==========================================
+             VIEW 2: TRANSACTION BILLING & POS
+             ========================================== -->
+        <div id="transaksi-view" class="view-section container-fluid d-none">
+          <div class="mb-4">
+            <h1 class="text-2xl font-bold text-white tracking-tight">Billing POS & Kasir</h1>
+            <p class="text-slate-400 text-sm m-0">Sewa meja, kelola makanan minuman, dan checkout invoice kuitansi thermal mini.</p>
+          </div>
+
+          <div class="row g-4" id="pos-tables-container"></div>
+        </div>
+
+        <!-- ==========================================
+             VIEW 3: MASTER DATA MEJA
+             ========================================== -->
+        <div id="meja-view" class="view-section container-fluid d-none">
+          <div class="mb-4">
+            <h1 class="text-2xl font-bold text-white tracking-tight">Master Data Meja Billiard</h1>
+            <p class="text-slate-400 text-sm m-0">Tambah meja baru, ubah tipe ukuran, edit tarif sewa per jam, atau atur mode servis maintenance.</p>
+          </div>
+          <!-- Form and table components are rendered dynamically inside custom JS or handled inside subpages -->
+          <div class="card-glass p-5 text-center">
+            <i class="fa fa-layer-group text-5xl text-slate-700 mb-3"></i>
+            <h4 class="text-white">Master Meja Billiard</h4>
+            <p class="text-xs text-muted max-w-sm mx-auto mb-4">Fitur penambahan dan pengeditan meja Billiard terikat dengan spreadsheet secara dinamis.</p>
+            <span class="badge bg-slate-900 border border-slate-800 text-slate-400 font-monospace">Gunakan menu di aplikasi utama</span>
+          </div>
+        </div>
+
+        <!-- ==========================================
+             VIEW 4: MASTER DATA PRODUK KAFE
+             ========================================== -->
+        <div id="produk-view" class="view-section container-fluid d-none">
+          <div class="mb-4">
+            <h1 class="text-2xl font-bold text-white tracking-tight">Master Produk Kafe</h1>
+            <p class="text-slate-400 text-sm m-0">Inventaris makanan ringan, soft drinks, mie instant, serta pencatatan sisa stok gudang.</p>
+          </div>
+          <div class="card-glass p-5 text-center">
+            <i class="fa fa-shopping-bag text-5xl text-slate-700 mb-3"></i>
+            <h4 class="text-white">Master Produk Kafe</h4>
+            <p class="text-xs text-muted max-w-sm mx-auto mb-4">Fitur inventaris piringan produk kafe billiard dan sinkronisasi stok gudang otomatis.</p>
+            <span class="badge bg-slate-900 border border-slate-800 text-slate-400 font-monospace">Gunakan menu di aplikasi utama</span>
+          </div>
+        </div>
+
+        <!-- ==========================================
+             VIEW 5: PEMBUKUAN KAS (EXPENSES & LABA RUGI)
+             ========================================== -->
+        <div id="pembukuan-view" class="view-section container-fluid d-none">
+          <div class="mb-4">
+            <h1 class="text-2xl font-bold text-white tracking-tight">Pembukuan Keuangan & Pengeluaran</h1>
+            <p class="text-slate-400 text-sm m-0">Catat pengeluaran gaji karyawan, internet, laken meja, listrik, dan analisa laba bersih berkala.</p>
+          </div>
+          <div class="card-glass p-5 text-center">
+            <i class="fa fa-book-open text-5xl text-slate-700 mb-3"></i>
+            <h4 class="text-white">Pembukuan Kas</h4>
+            <p class="text-xs text-muted max-w-sm mx-auto mb-4">Catat pengeluaran operasional dan pantau neraca laba-rugi kotor.</p>
+            <span class="badge bg-slate-900 border border-slate-800 text-slate-400 font-monospace">Gunakan menu di aplikasi utama</span>
+          </div>
+        </div>
+
+        <!-- ==========================================
+             VIEW 6: LAPORAN & RIWAYAT TRANSAKSI
+             ========================================== -->
+        <div id="laporan-view" class="view-section container-fluid d-none">
+          <div class="mb-4">
+            <h1 class="text-2xl font-bold text-white tracking-tight">Laporan & Arsip Transaksi</h1>
+            <p class="text-slate-400 text-sm m-0">Rekam jejak kuitansi selesai, query rentang tanggal kalender, ekspor file CSV Excel atau PDF.</p>
+          </div>
+          <div class="card-glass p-5 text-center">
+            <i class="fa fa-file-invoice-dollar text-5xl text-slate-700 mb-3"></i>
+            <h4 class="text-white">Laporan Keuangan</h4>
+            <p class="text-xs text-muted max-w-sm mx-auto mb-4">Ekspor data pembukuan ke Microsoft Excel atau cetak ledger A4 resmi secara mandiri.</p>
+            <span class="badge bg-slate-900 border border-slate-800 text-slate-400 font-monospace">Gunakan menu di aplikasi utama</span>
+          </div>
+        </div>
+
+        <!-- ==========================================
+             VIEW 7: AUDIT LOG AKTIVITAS
+             ========================================== -->
+        <div id="logs-view" class="view-section container-fluid d-none">
+          <div class="mb-4">
+            <h1 class="text-2xl font-bold text-white tracking-tight">Audit Log Keamanan</h1>
+            <p class="text-slate-400 text-sm m-0">Pengawasan digital rekam aktivitas administrator, kasir login, checkout sewa, dan pengeluaran.</p>
+          </div>
+          <div class="card-glass p-5 text-center">
+            <i class="fa fa-shield-halved text-5xl text-slate-700 mb-3"></i>
+            <h4 class="text-white">Audit Log Keamanan</h4>
+            <p class="text-xs text-muted max-w-sm mx-auto mb-4">Mencegah fraud internal kasir dengan pengawasan log audit yang tidak dapat dihapus.</p>
+            <span class="badge bg-slate-900 border border-slate-800 text-slate-400 font-monospace">Gunakan menu di aplikasi utama</span>
+          </div>
+        </div>
+
+        <!-- ==========================================
+             VIEW 8: SYSTEM CONFIG SETTINGS
+             ========================================== -->
+        <div id="settings-view" class="view-section container-fluid d-none">
+          <div class="mb-4">
+            <h1 class="text-2xl font-bold text-white tracking-tight">Pengaturan Sistem & Database</h1>
+            <p class="text-slate-400 text-sm m-0">Atur parameter perpajakan restoran, default potongan diskon member, dan link Google Spreadsheet.</p>
+          </div>
+          <div class="card-glass p-5 text-center">
+            <i class="fa fa-cog text-5xl text-slate-700 mb-3"></i>
+            <h4 class="text-white">Pengaturan Sistem</h4>
+            <p class="text-xs text-muted max-w-sm mx-auto mb-4">Ubah nama lounge billiard, persentase pajak restoran, dan ubah mode offline ke online.</p>
+            <span class="badge bg-slate-900 border border-slate-800 text-slate-400 font-monospace">Gunakan menu di aplikasi utama</span>
+          </div>
+        </div>
+
+      </main>
+
+      <!-- Desktop absolute bottom tiny footer -->
+      <footer class="h-10 text-[10px] text-slate-600 font-semibold px-4 d-flex justify-between align-items-center border-top border-slate-900 uppercase">
+        <span>&copy; 2026 B8 Billiard POS & Accounting System</span>
+        <span>Version 1.0.0</span>
+      </footer>
+
+    </div>
+
+  </section>
+
+  <!-- JS Dependencies -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="app.js"></script>
+
+  <!-- Custom Binding Script for Login UI Portal -->
+  <script>
+    const loginForm = document.getElementById("login-form");
+    if (loginForm) {
+      loginForm.onsubmit = function(e) {
+        e.preventDefault();
+        const user = document.getElementById("login-username").value.trim().toLowerCase();
+        const pass = document.getElementById("login-password").value;
+
+        if ((user === "admin" && pass === "admin123") || (user === "kasir" && pass === "kasir123")) {
+          const role = user === "admin" ? "Admin" : "Kasir";
+          currentSession = {
+            username: user,
+            name: user === "admin" ? "Administrator" : "Kasir Billiard",
+            role: role
+          };
+
+          // Hide Login, Show Main System
+          document.getElementById("login-section").classList.add("d-none");
+          document.getElementById("main-system-layout").classList.remove("d-none");
+          
+          // Set badges in sidebar
+          document.getElementById("user-avatar-badge").textContent = role.charAt(0);
+          document.getElementById("session-display-name").textContent = currentSession.name;
+          document.getElementById("session-display-role").textContent = role;
+
+          // Admin see everything, cashier only transaksi
+          if (role === "Kasir") {
+            document.querySelectorAll(".sidebar .nav-link").forEach(link => {
+              if (link.getAttribute("data-view") !== "transaksi") {
+                link.classList.add("d-none");
+              }
+            });
+            switchView("transaksi");
+          } else {
+            document.querySelectorAll(".sidebar .nav-link").forEach(link => link.classList.remove("d-none"));
+            switchView("dashboard");
+          }
+
+          writeLog("User Login", `Sesi ${role} berhasil masuk ke konsol kasir.`);
+          showToast(`Selamat datang, ${currentSession.name}!`, "success");
+        } else {
+          showToast("Username atau password salah!", "error");
+        }
+      };
+    }
+
+    function logoutUser() {
+      if (confirm("Apakah Anda yakin ingin keluar dari sistem?")) {
+        writeLog("User Logout", "Melakukan logout sesi manual.");
+        currentSession = null;
+        document.getElementById("main-system-layout").classList.add("d-none");
+        document.getElementById("login-section").classList.remove("d-none");
+        document.getElementById("login-username").value = "";
+        document.getElementById("login-password").value = "";
+      }
+    }
+
+    function toggleMobileSidebar() {
+      document.querySelector(".sidebar").classList.toggle("show");
+    }
+  </script>
+</body>
+</html>

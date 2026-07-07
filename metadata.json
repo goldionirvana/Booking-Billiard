@@ -1,0 +1,6 @@
+{
+  "name": "Billiard POS & Accounting",
+  "description": "Sistem Kasir (POS) Billiard modern dan pembukuan keuangan terintegrasi dengan Google Spreadsheet secara real-time.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

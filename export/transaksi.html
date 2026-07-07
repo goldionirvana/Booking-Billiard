@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Billiard POS - Billing & Kasir</title>
+  
+  <!-- CSS Dependencies -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-950 p-4 p-md-5">
+
+  <div class="container-fluid">
+    
+    <!-- Top info -->
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom border-slate-800 pb-3">
+      <div>
+        <h1 class="text-2xl font-bold text-white tracking-tight">Billing & POS Kasir</h1>
+        <p class="text-slate-400 text-sm m-0">Sewa meja billiard aktif, tambah pesanan minuman kafe, dan selesaikan transaksi kasir.</p>
+      </div>
+      <a href="index.html" class="btn btn-outline-secondary btn-sm text-xs rounded-xl font-bold py-2 px-3 border-slate-800 text-slate-300">
+        <i class="fa fa-arrow-left me-1"></i> Kembali ke Portal
+      </a>
+    </div>
+
+    <!-- Active Tables Grid Mockup -->
+    <div class="row g-4">
+      
+      <!-- Table 1 (Active playing) -->
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="billiard-table-box p-4 h-100 active border-danger">
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <div>
+              <span class="text-[10px] text-muted uppercase font-bold tracking-wider">9-Feet Premium</span>
+              <h4 class="text-white font-extrabold mt-1 mb-0">Meja Nol 01</h4>
+              <p class="text-xs text-muted mb-0">Meja VIP Area 1</p>
+            </div>
+            <span class="status-badge badge-dipakai">DIPAKAI</span>
+          </div>
+
+          <div class="bg-black/30 p-3 rounded-lg border border-slate-750 mb-3">
+            <p class="text-xs text-muted mb-1">Customer: <strong class="text-white">Alvin Pratama</strong></p>
+            <div class="d-flex justify-content-between text-xs font-mono">
+              <div>
+                <span class="text-slate-500 d-block">Durasi Bermain</span>
+                <span class="text-emerald-400 font-bold">01:42:15</span>
+              </div>
+              <div class="text-end">
+                <span class="text-slate-500 d-block">Tarif Berjalan</span>
+                <span class="text-emerald-400 font-bold">Rp 85.000</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-auto pt-3 border-top border-slate-800">
+            <button class="btn btn-danger w-100 py-2.5 font-bold text-xs uppercase cursor-pointer" onclick="alert('Tekan Selesai Bermain di index.html untuk melakukan simulasi checkout!')">
+              Selesai Bermain (Checkout)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table 2 (Active playing) -->
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="billiard-table-box p-4 h-100 active border-danger">
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <div>
+              <span class="text-[10px] text-muted uppercase font-bold tracking-wider">9-Feet Premium</span>
+              <h4 class="text-white font-extrabold mt-1 mb-0">Meja Nol 02</h4>
+              <p class="text-xs text-muted mb-0">Meja VIP Area 2</p>
+            </div>
+            <span class="status-badge badge-dipakai">DIPAKAI</span>
+          </div>
+
+          <div class="bg-black/30 p-3 rounded-lg border border-slate-750 mb-3">
+            <p class="text-xs text-muted mb-1">Customer: <strong class="text-white">Bro Ferry</strong></p>
+            <div class="d-flex justify-content-between text-xs font-mono">
+              <div>
+                <span class="text-slate-500 d-block">Durasi Bermain</span>
+                <span class="text-emerald-400 font-bold">00:15:30</span>
+              </div>
+              <div class="text-end">
+                <span class="text-slate-500 d-block">Tarif Berjalan</span>
+                <span class="text-emerald-400 font-bold">Rp 12.500</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-auto pt-3 border-top border-slate-800">
+            <button class="btn btn-danger w-100 py-2.5 font-bold text-xs uppercase cursor-pointer" onclick="alert('Gunakan halaman index.html untuk checkout interaktif!')">
+              Selesai Bermain (Checkout)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table 3 (Empty) -->
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="billiard-table-box p-4 h-100 border-slate-800">
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <div>
+              <span class="text-[10px] text-muted uppercase font-bold tracking-wider">9-Feet Standard</span>
+              <h4 class="text-white font-extrabold mt-1 mb-0">Meja Nol 03</h4>
+              <p class="text-xs text-muted mb-0">Meja Biasa Tengah</p>
+            </div>
+            <span class="status-badge badge-kosong">KOSONG</span>
+          </div>
+
+          <div class="p-3 bg-black/10 text-xs text-muted rounded border border-slate-800 d-flex justify-content-between mb-3">
+            <span>Tarif per jam:</span>
+            <strong class="text-slate-200">Rp 40.000</strong>
+          </div>
+
+          <div class="mt-auto pt-3 border-top border-slate-800">
+            <button class="btn btn-outline-success w-100 py-2.5 text-xs font-bold uppercase cursor-pointer" onclick="alert('Tekan tombol Mulai Sewa di index.html untuk mengaktifkan timer secara luring!')">
+              Mulai Sewa Meja
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
