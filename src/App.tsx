@@ -1,13 +1,28 @@
 import React, { useState, useEffect, useRef } from "react";
 import { 
   LayoutDashboard, Play, Layers, ShoppingBag, BookOpen, BarChart2, ShieldCheck, Settings, 
-  LogOut, Menu, X, HelpCircle, Database, Moon, Sun, Clock, UserCheck
+  LogOut, Menu, X, HelpCircle, Database, Moon, Sun, Clock, UserCheck, RefreshCw
 } from "lucide-react";
 
 import { Table, Product, Transaction, Expense, AuditLog, AppSetting } from "./types";
 import { 
   initialTables, initialProducts, initialExpenses, initialTransactions, initialAuditLogs, initialSettings 
 } from "./utils";
+
+import {
+  fetchTablesFromFirebase,
+  fetchProductsFromFirebase,
+  fetchTransactionsFromFirebase,
+  fetchExpensesFromFirebase,
+  fetchAuditLogsFromFirebase,
+  saveTableToFirebase,
+  saveProductToFirebase,
+  saveTransactionToFirebase,
+  saveExpenseToFirebase,
+  deleteExpenseFromFirebase,
+  saveAuditLogToFirebase,
+  testConnection
+} from "./firebaseService";
 
 // Component imports
 import Login from "./components/Login";
@@ -71,6 +86,7 @@ export default function App() {
     if (storedSettings) {
       setSettings(JSON.parse(storedSettings));
     } else {
+      setSettings(initialSettings);
       localStorage.setItem("billiard_settings", JSON.stringify(initialSettings));
     }
 
@@ -120,36 +136,100 @@ export default function App() {
     }
   }, []);
 
-  // Fetch full data from Google Sheets if online mode is checked
+  // Fetch full data from Firebase Cloud when logged in
   useEffect(() => {
-    if (!settings.useDemoMode && settings.appsScriptUrl && session) {
-      fetchSpreadsheetData();
+    if (session) {
+      fetchFirebaseData();
     }
-  }, [settings.useDemoMode, settings.appsScriptUrl, session]);
+  }, [session]);
 
-  const fetchSpreadsheetData = async () => {
+  const fetchFirebaseData = async () => {
     setIsLoading(true);
     try {
-      showNotification("Menghubungkan ke Google Spreadsheet...", "info");
-      
-      const [resMeja, resProduk, resRiwayat, resExp, resLogs] = await Promise.all([
-        fetch(`${settings.appsScriptUrl}?action=getMeja`, { method: "GET", mode: "cors" }).then(r => r.json()),
-        fetch(`${settings.appsScriptUrl}?action=getProduk`, { method: "GET", mode: "cors" }).then(r => r.json()),
-        fetch(`${settings.appsScriptUrl}?action=getRiwayat`, { method: "GET", mode: "cors" }).then(r => r.json()),
-        fetch(`${settings.appsScriptUrl}?action=getPengeluaran`, { method: "GET", mode: "cors" }).then(r => r.json()),
-        fetch(`${settings.appsScriptUrl}?action=getAuditLog`, { method: "GET", mode: "cors" }).then(r => r.json())
-      ]);
+      showNotification("Menghubungkan ke Firebase Cloud...", "info");
+      await testConnection();
+      const fbTables = await fetchTablesFromFirebase();
+      const fbProducts = await fetchProductsFromFirebase();
+      const fbTransactions = await fetchTransactionsFromFirebase();
+      const fbExpenses = await fetchExpensesFromFirebase();
+      const fbLogs = await fetchAuditLogsFromFirebase();
 
-      if (resMeja.status === "success") setTables(resMeja.data);
-      if (resProduk.status === "success") setProducts(resProduk.data);
-      if (resRiwayat.status === "success") setTransactions(resRiwayat.data);
-      if (resExp.status === "success") setExpenses(resExp.data);
-      if (resLogs.status === "success") setAuditLogs(resLogs.data);
+      if (fbTables && fbTables.length > 0) {
+        setTables(fbTables);
+        localStorage.setItem("billiard_tables", JSON.stringify(fbTables));
+      } else if (tables.length > 0) {
+        for (const t of tables) {
+          await saveTableToFirebase(t);
+        }
+      } else {
+        setTables(initialTables);
+        for (const t of initialTables) {
+          await saveTableToFirebase(t);
+        }
+      }
 
-      showNotification("Seluruh database Google Sheets tersinkronisasi!", "success");
-    } catch (err) {
-      console.error(err);
-      showNotification("Gagal sinkron Google Sheets. Berjalan dalam mode lokal.", "error");
+      if (fbProducts && fbProducts.length > 0) {
+        setProducts(fbProducts);
+        localStorage.setItem("billiard_products", JSON.stringify(fbProducts));
+      } else if (products.length > 0) {
+        for (const p of products) {
+          await saveProductToFirebase(p);
+        }
+      } else {
+        setProducts(initialProducts);
+        for (const p of initialProducts) {
+          await saveProductToFirebase(p);
+        }
+      }
+
+      if (fbExpenses && fbExpenses.length > 0) {
+        setExpenses(fbExpenses);
+        localStorage.setItem("billiard_expenses", JSON.stringify(fbExpenses));
+      } else if (expenses.length > 0) {
+        for (const e of expenses) {
+          await saveExpenseToFirebase(e);
+        }
+      } else {
+        setExpenses(initialExpenses);
+        for (const e of initialExpenses) {
+          await saveExpenseToFirebase(e);
+        }
+      }
+
+      if (fbTransactions && fbTransactions.length > 0) {
+        const sortedTrans = [...fbTransactions].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+        setTransactions(sortedTrans);
+        localStorage.setItem("billiard_transactions", JSON.stringify(sortedTrans));
+      } else if (transactions.length > 0) {
+        for (const trans of transactions) {
+          await saveTransactionToFirebase(trans);
+        }
+      } else {
+        setTransactions(initialTransactions);
+        for (const trans of initialTransactions) {
+          await saveTransactionToFirebase(trans);
+        }
+      }
+
+      if (fbLogs && fbLogs.length > 0) {
+        const sortedLogs = [...fbLogs].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+        setAuditLogs(sortedLogs);
+        localStorage.setItem("billiard_logs", JSON.stringify(sortedLogs));
+      } else if (auditLogs.length > 0) {
+        for (const log of auditLogs) {
+          await saveAuditLogToFirebase(log);
+        }
+      } else {
+        setAuditLogs(initialAuditLogs);
+        for (const log of initialAuditLogs) {
+          await saveAuditLogToFirebase(log);
+        }
+      }
+
+      showNotification("Database Firebase Cloud berhasil disinkronkan!", "success");
+    } catch (err: any) {
+      console.error("Gagal sinkron Firebase:", err);
+      showNotification("Gagal membaca dari Firebase Cloud. Menggunakan cache lokal.", "error");
     } finally {
       setIsLoading(false);
     }
@@ -171,20 +251,8 @@ export default function App() {
     setAuditLogs(updatedLogs);
     localStorage.setItem("billiard_logs", JSON.stringify(updatedLogs));
 
-    // Post to spreadsheet if online
-    if (!settings.useDemoMode && settings.appsScriptUrl) {
-      fetch(settings.appsScriptUrl, {
-        method: "POST",
-        mode: "cors",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({
-          action: "saveAuditLog",
-          user: session ? session.name : "System",
-          act: action,
-          detail: detail
-        })
-      }).catch(console.error);
-    }
+    // Save to Firebase
+    saveAuditLogToFirebase(newLog).catch(console.error);
   };
 
   // =========================================================
@@ -234,75 +302,46 @@ export default function App() {
     setTables(updatedTables);
     localStorage.setItem("billiard_tables", JSON.stringify(updatedTables));
 
-    // Handle online spreadsheet mirror if checked
-    if (!settings.useDemoMode && settings.appsScriptUrl) {
-      // Find what changed and update Google sheet
-      // To keep it simple and robust, we can upload the updated list or write the target mesa
-      // We will perform a loop for active play starting / checkout
-      updatedTables.forEach((t) => {
-        const prev = tables.find((p) => p.id === t.id);
-        if (JSON.stringify(prev) !== JSON.stringify(t)) {
-          fetch(settings.appsScriptUrl, {
-            method: "POST",
-            mode: "cors",
-            headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify({ action: "saveMeja", meja: t })
-          }).catch(console.error);
-        }
-      });
-    }
+    // Handle Firebase Sync
+    updatedTables.forEach((t) => {
+      const prev = tables.find((p) => p.id === t.id);
+      if (JSON.stringify(prev) !== JSON.stringify(t)) {
+        saveTableToFirebase(t).catch(console.error);
+      }
+    });
   };
 
   const handleUpdateProducts = (updatedProducts: Product[]) => {
     setProducts(updatedProducts);
     localStorage.setItem("billiard_products", JSON.stringify(updatedProducts));
 
-    if (!settings.useDemoMode && settings.appsScriptUrl) {
-      updatedProducts.forEach((p) => {
-        const prev = products.find((pr) => pr.id === p.id);
-        if (JSON.stringify(prev) !== JSON.stringify(p)) {
-          fetch(settings.appsScriptUrl, {
-            method: "POST",
-            mode: "cors",
-            headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify({ action: "saveProduk", produk: p })
-          }).catch(console.error);
-        }
-      });
-    }
+    // Handle Firebase Sync
+    updatedProducts.forEach((p) => {
+      const prev = products.find((pr) => pr.id === p.id);
+      if (JSON.stringify(prev) !== JSON.stringify(p)) {
+        saveProductToFirebase(p).catch(console.error);
+      }
+    });
   };
 
   const handleUpdateExpenses = (updatedExpenses: Expense[]) => {
     setExpenses(updatedExpenses);
     localStorage.setItem("billiard_expenses", JSON.stringify(updatedExpenses));
 
-    if (!settings.useDemoMode && settings.appsScriptUrl) {
-      // Find deleted
-      if (updatedExpenses.length < expenses.length) {
-        expenses.forEach((e) => {
-          if (!updatedExpenses.some((un) => un.id === e.id)) {
-            fetch(settings.appsScriptUrl, {
-              method: "POST",
-              mode: "cors",
-              headers: { "Content-Type": "text/plain;charset=utf-8" },
-              body: JSON.stringify({ action: "deletePengeluaran", id: e.id })
-            }).catch(console.error);
-          }
-        });
-      } else {
-        // Find saved/updated
-        updatedExpenses.forEach((e) => {
-          const prev = expenses.find((ex) => ex.id === e.id);
-          if (JSON.stringify(prev) !== JSON.stringify(e)) {
-            fetch(settings.appsScriptUrl, {
-              method: "POST",
-              mode: "cors",
-              headers: { "Content-Type": "text/plain;charset=utf-8" },
-              body: JSON.stringify({ action: "savePengeluaran", pengeluaran: e })
-            }).catch(console.error);
-          }
-        });
-      }
+    // Handle Firebase Sync (find deleted or updated)
+    if (updatedExpenses.length < expenses.length) {
+      expenses.forEach((e) => {
+        if (!updatedExpenses.some((un) => un.id === e.id)) {
+          deleteExpenseFromFirebase(e.id).catch(console.error);
+        }
+      });
+    } else {
+      updatedExpenses.forEach((e) => {
+        const prev = expenses.find((ex) => ex.id === e.id);
+        if (JSON.stringify(prev) !== JSON.stringify(e)) {
+          saveExpenseToFirebase(e).catch(console.error);
+        }
+      });
     }
   };
 
@@ -311,27 +350,14 @@ export default function App() {
     setTransactions(updatedTrans);
     localStorage.setItem("billiard_transactions", JSON.stringify(updatedTrans));
 
+    // Handle Firebase Sync
+    saveTransactionToFirebase(newTrans).catch(console.error);
+
     // Audit logs for checkout / start playing
     if (newTrans.status === "Aktif") {
       recordAuditLog("Mulai Sewa Meja", `Meja Nol ${newTrans.tableNumber} mulai disewa oleh customer: ${newTrans.customer}`);
     } else {
       recordAuditLog("Checkout Pembayaran", `Pelunasan invoice ${newTrans.invoiceNumber} senilai ${newTrans.grandTotal}`);
-    }
-
-    // Mirror to Google Sheets Web App
-    if (!settings.useDemoMode && settings.appsScriptUrl) {
-      const endpoint = newTrans.status === "Aktif" ? "saveTransaksi" : "finishTransaksi";
-      const payloadKey = newTrans.status === "Aktif" ? "transaksi" : "checkout";
-
-      fetch(settings.appsScriptUrl, {
-        method: "POST",
-        mode: "cors",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({
-          action: endpoint,
-          [payloadKey]: newTrans
-        })
-      }).catch(console.error);
     }
   };
 
@@ -339,15 +365,6 @@ export default function App() {
     setSettings(newSettings);
     localStorage.setItem("billiard_settings", JSON.stringify(newSettings));
     recordAuditLog("Update Pengaturan", `Mengubah nama billiard ke: ${newSettings.billiardName}`);
-
-    if (!newSettings.useDemoMode && newSettings.appsScriptUrl) {
-      fetch(newSettings.appsScriptUrl, {
-        method: "POST",
-        mode: "cors",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ action: "saveSettings", settings: newSettings })
-      }).catch(console.error);
-    }
   };
 
   const handleLoginSuccess = (user: { name: string; role: string; username: string }) => {
@@ -395,7 +412,16 @@ export default function App() {
       case "logs":
         return <AuditLogView auditLogs={auditLogs} userRole={session?.role || "Kasir"} />;
       case "settings":
-        return <SettingsView settings={settings} userRole={session?.role || "Kasir"} onUpdateSettings={handleUpdateSettings} onShowNotification={showNotification} />;
+        return (
+          <SettingsView 
+            settings={settings} 
+            userRole={session?.role || "Kasir"} 
+            onUpdateSettings={handleUpdateSettings} 
+            onShowNotification={showNotification} 
+            onSyncDatabase={fetchFirebaseData}
+            isSyncing={isLoading}
+          />
+        );
       default:
         return <Dashboard tables={tables} transactions={transactions} expenses={expenses} onNavigateToView={setActiveView} />;
     }
@@ -538,12 +564,18 @@ export default function App() {
 
             {/* Offline/Online indicators */}
             <div className="flex items-center gap-2">
-              <span className={`px-3 py-1 rounded-full text-[10px] font-semibold border ${
-                settings.useDemoMode 
-                  ? "bg-gray-800 text-gray-400 border-gray-750" 
-                  : "bg-green-500/10 text-green-500 border-green-500/20"
-              }`}>
-                {settings.useDemoMode ? "Offline DB" : "System Live"}
+              <button
+                id="navbar-sync-firebase-btn"
+                onClick={fetchFirebaseData}
+                disabled={isLoading}
+                className="px-3 py-1 rounded-full bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50 text-[10px] font-bold"
+                title="Sinkronisasi Database Firebase Cloud"
+              >
+                <RefreshCw className={`w-3 h-3 ${isLoading ? "animate-spin" : ""}`} />
+                <span>Sync Cloud</span>
+              </button>
+              <span className="px-3 py-1 rounded-full text-[10px] font-semibold border bg-indigo-500/10 text-indigo-400 border-indigo-500/20">
+                Cloud Connected
               </span>
             </div>
           </div>
@@ -558,7 +590,7 @@ export default function App() {
             <div className="absolute inset-0 bg-[#0f1115]/60 backdrop-blur-[1px] flex items-center justify-center z-50">
               <div className="bg-[#1a1c23] border border-gray-800 px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3">
                 <span className="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></span>
-                <span className="text-xs font-bold text-gray-200 uppercase tracking-wider">Menghubungkan Spreadsheet...</span>
+                <span className="text-xs font-bold text-gray-200 uppercase tracking-wider">Menyinkronkan Database...</span>
               </div>
             </div>
           )}

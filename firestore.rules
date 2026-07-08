@@ -1,0 +1,123 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Entity validation helpers
+    function isValidTable(data) {
+      return data.keys().hasAll(['number', 'name', 'type', 'pricePerHour', 'status'])
+        && data.number is string && data.number.size() <= 32
+        && data.name is string && data.name.size() <= 100
+        && data.type is string && data.type.size() <= 50
+        && (data.pricePerHour is number || data.pricePerHour is int)
+        && data.status is string && data.status.size() <= 32;
+    }
+
+    function isValidProduct(data) {
+      return data.keys().hasAll(['id', 'name', 'category', 'price', 'stock'])
+        && data.id is string && data.id.size() <= 64
+        && data.name is string && data.name.size() <= 150
+        && data.category is string && data.category.size() <= 50
+        && (data.price is number || data.price is int)
+        && (data.stock is number || data.stock is int);
+    }
+
+    function isValidTransaction(data) {
+      return data.keys().hasAll(['invoiceNumber', 'date', 'timestamp', 'customer', 'tableNumber', 'tableType', 'pricePerHour', 'startTime', 'durationHours', 'tableCost', 'itemsCost', 'taxCost', 'discountCost', 'grandTotal', 'paymentMethod', 'amountPaid', 'changeAmount', 'status', 'cashierName'])
+        && data.invoiceNumber is string && data.invoiceNumber.size() <= 64
+        && data.date is string && data.date.size() <= 15
+        && data.timestamp is string && data.timestamp.size() <= 50
+        && data.customer is string && data.customer.size() <= 150
+        && data.tableNumber is string && data.tableNumber.size() <= 32
+        && data.tableType is string && data.tableType.size() <= 50
+        && (data.pricePerHour is number || data.pricePerHour is int)
+        && data.startTime is string && data.startTime.size() <= 50
+        && (data.durationHours is number || data.durationHours is int)
+        && (data.tableCost is number || data.tableCost is int)
+        && (data.itemsCost is number || data.itemsCost is int)
+        && (data.taxCost is number || data.taxCost is int)
+        && (data.discountCost is number || data.discountCost is int)
+        && (data.grandTotal is number || data.grandTotal is int)
+        && data.paymentMethod is string && data.paymentMethod.size() <= 32
+        && (data.amountPaid is number || data.amountPaid is int)
+        && (data.changeAmount is number || data.changeAmount is int)
+        && data.status is string && data.status.size() <= 32
+        && data.cashierName is string && data.cashierName.size() <= 100;
+    }
+
+    function isValidExpense(data) {
+      return data.keys().hasAll(['id', 'date', 'category', 'amount', 'note'])
+        && data.id is string && data.id.size() <= 64
+        && data.date is string && data.date.size() <= 15
+        && data.category is string && data.category.size() <= 50
+        && (data.amount is number || data.amount is int)
+        && data.note is string && data.note.size() <= 500;
+    }
+
+    function isValidAuditLog(data) {
+      return data.keys().hasAll(['id', 'timestamp', 'user', 'action', 'detail'])
+        && data.id is string && data.id.size() <= 64
+        && data.timestamp is string && data.timestamp.size() <= 50
+        && data.user is string && data.user.size() <= 100
+        && data.action is string && data.action.size() <= 100
+        && data.detail is string && data.detail.size() <= 2000;
+    }
+
+    // Rules for individual collections
+    match /tables/{tableId} {
+      allow read, list: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(tableId) && isValidTable(incoming());
+      allow update: if isSignedIn() && isValidId(tableId) && isValidTable(incoming());
+      allow delete: if isSignedIn() && isValidId(tableId);
+    }
+
+    match /products/{productId} {
+      allow read, list: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(productId) && isValidProduct(incoming());
+      allow update: if isSignedIn() && isValidId(productId) && isValidProduct(incoming());
+      allow delete: if isSignedIn() && isValidId(productId);
+    }
+
+    match /transactions/{transactionId} {
+      allow read, list: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(transactionId) && isValidTransaction(incoming());
+      allow update: if isSignedIn() && isValidId(transactionId) && isValidTransaction(incoming());
+      allow delete: if isSignedIn() && isValidId(transactionId);
+    }
+
+    match /expenses/{expenseId} {
+      allow read, list: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(expenseId) && isValidExpense(incoming());
+      allow update: if isSignedIn() && isValidId(expenseId) && isValidExpense(incoming());
+      allow delete: if isSignedIn() && isValidId(expenseId);
+    }
+
+    match /auditLogs/{logId} {
+      allow read, list: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(logId) && isValidAuditLog(incoming());
+      allow update: if isSignedIn() && isValidId(logId) && isValidAuditLog(incoming());
+      allow delete: if isSignedIn() && isValidId(logId);
+    }
+  }
+}

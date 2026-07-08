@@ -1,0 +1,117 @@
+{
+  "entities": {
+    "Table": {
+      "title": "Billiard Table",
+      "description": "Billiard table record and its active status",
+      "type": "object",
+      "properties": {
+        "number": { "type": "string", "description": "Unique table identifier/number" },
+        "name": { "type": "string", "description": "Display name of the table" },
+        "type": { "type": "string", "enum": ["9-Feet Standard", "9-Feet VIP", "8-Feet Standard"], "description": "Table dimension and premium tier" },
+        "pricePerHour": { "type": "number", "description": "Hourly rate" },
+        "status": { "type": "string", "enum": ["Kosong", "Dipakai", "Maintenance"], "description": "Current table usage status" },
+        "currentStartTime": { "type": "string", "description": "ISO timestamp of when the session started" },
+        "currentCustomer": { "type": "string", "description": "Name of the customer playing" },
+        "currentEstimatedHours": { "type": "number", "description": "Estimated duration for open/package play" },
+        "billingType": { "type": "string", "enum": ["Open", "Paket"], "description": "Billing mode" },
+        "packageHours": { "type": "number", "description": "Selected package hour duration" }
+      },
+      "required": ["number", "name", "type", "pricePerHour", "status"]
+    },
+    "Product": {
+      "title": "Cafe Product",
+      "description": "F&B items and accessory rentals available at the lounge",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique product ID" },
+        "name": { "type": "string", "description": "Product name" },
+        "category": { "type": "string", "enum": ["Makanan", "Minuman", "Lainnya"], "description": "F&B category classification" },
+        "price": { "type": "number", "description": "Unit price" },
+        "stock": { "type": "number", "description": "Current inventory stock count" }
+      },
+      "required": ["id", "name", "category", "price", "stock"]
+    },
+    "Transaction": {
+      "title": "Billiard Transaction",
+      "description": "Completed rental play and food/beverage sale invoice record",
+      "type": "object",
+      "properties": {
+        "invoiceNumber": { "type": "string", "description": "Unique invoice ID formatted as INV-YYYYMMDD-XXXX" },
+        "date": { "type": "string", "description": "YYYY-MM-DD local format date" },
+        "timestamp": { "type": "string", "description": "ISO timestamp when the transaction was completed" },
+        "customer": { "type": "string", "description": "Customer name" },
+        "tableNumber": { "type": "string", "description": "Table number used" },
+        "tableType": { "type": "string", "description": "Type of billiard table" },
+        "pricePerHour": { "type": "number", "description": "Hourly fee rate charged" },
+        "startTime": { "type": "string", "description": "ISO timestamp when play session began" },
+        "endTime": { "type": "string", "description": "ISO timestamp when play session ended" },
+        "durationHours": { "type": "number", "description": "Total play duration calculated in hours" },
+        "tableCost": { "type": "number", "description": "Subtotal cost for table usage" },
+        "itemsCost": { "type": "number", "description": "Subtotal cost for additional food, beverages, or rentals" },
+        "taxCost": { "type": "number", "description": "Calculated government tax" },
+        "discountCost": { "type": "number", "description": "Calculated or manual discount amount applied" },
+        "grandTotal": { "type": "number", "description": "Net payable amount" },
+        "paymentMethod": { "type": "string", "enum": ["Cash", "QRIS", "Transfer"], "description": "Method of customer payment" },
+        "amountPaid": { "type": "number", "description": "Amount handed or scanned" },
+        "changeAmount": { "type": "number", "description": "Change returned to customer" },
+        "status": { "type": "string", "enum": ["Selesai", "Batal"], "description": "Invoice status" },
+        "cashierName": { "type": "string", "description": "Name of the logged-in employee who handled POS" },
+        "billingType": { "type": "string", "enum": ["Open", "Paket"], "description": "Billing mode of play" },
+        "packageHours": { "type": "number", "description": "Duration of package if applicable" },
+        "items": {
+          "type": "array",
+          "description": "Embedded food and beverages purchased during the session"
+        }
+      },
+      "required": ["invoiceNumber", "date", "timestamp", "customer", "tableNumber", "tableType", "pricePerHour", "startTime", "durationHours", "tableCost", "itemsCost", "taxCost", "discountCost", "grandTotal", "paymentMethod", "amountPaid", "changeAmount", "status", "cashierName"]
+    },
+    "Expense": {
+      "title": "Business Expense",
+      "description": "Daily operational expense records",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique expense record identifier" },
+        "date": { "type": "string", "description": "YYYY-MM-DD local format date" },
+        "category": { "type": "string", "enum": ["Operasional", "Inventaris", "Gaji", "Lain-lain"], "description": "Expense category" },
+        "amount": { "type": "number", "description": "Amount spent" },
+        "note": { "type": "string", "description": "Brief description of the expense" }
+      },
+      "required": ["id", "date", "category", "amount", "note"]
+    },
+    "AuditLog": {
+      "title": "System Audit Log",
+      "description": "Security and activity trail of user actions",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique log record ID" },
+        "timestamp": { "type": "string", "description": "ISO timestamp of the recorded action" },
+        "user": { "type": "string", "description": "User or system entity who triggered the log" },
+        "action": { "type": "string", "description": "Short code or name of action performed" },
+        "detail": { "type": "string", "description": "Verbose context and key-value changes" }
+      },
+      "required": ["id", "timestamp", "user", "action", "detail"]
+    }
+  },
+  "firestore": {
+    "tables": {
+      "schema": "Table",
+      "description": "Billiard tables listing with real-time occupancy data"
+    },
+    "products": {
+      "schema": "Product",
+      "description": "Product catalog and food/beverage menu"
+    },
+    "transactions": {
+      "schema": "Transaction",
+      "description": "Pos checkout play-billing and cafe orders journal"
+    },
+    "expenses": {
+      "schema": "Expense",
+      "description": "Operational and inventory cost logs"
+    },
+    "auditLogs": {
+      "schema": "AuditLog",
+      "description": "Accountability action trails"
+    }
+  }
+}

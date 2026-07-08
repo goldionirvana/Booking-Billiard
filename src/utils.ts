@@ -138,7 +138,7 @@ export const initialAuditLogs: AuditLog[] = [
 
 export const initialSettings: AppSetting = {
   appsScriptUrl: "",
-  useDemoMode: true,
+  useDemoMode: false,
   taxPercent: 10,
   discountPercent: 0,
   billiardName: "Arena Billiard & Lounge",

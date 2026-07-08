@@ -47,6 +47,15 @@ function doGet(e) {
       case "getAuditLog":
         data = getAuditLogData();
         break;
+      case "getSyncData":
+        data = {
+          meja: getMejaData(),
+          produk: getProdukData(),
+          riwayat: getRiwayatData(),
+          pengeluaran: getPengeluaranData(),
+          auditLog: getAuditLogData()
+        };
+        break;
       case "getSettings":
         data = getSettingsData();
         break;
@@ -240,7 +249,7 @@ function loginUser(username, password) {
 }
 
 function getDashboardData() {
-  var trans = getRowsData("Transaksi");
+  var trans = getRiwayatData();
   var mejas = getRowsData("Meja");
   
   var todayStr = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
@@ -255,8 +264,9 @@ function getDashboardData() {
   
   trans.forEach(function(t) {
     if (t.status === "Selesai") {
-      var tDate = new Date(t.timestamp);
-      var tDateStr = t.date; // YYYY-MM-DD
+      var tDate = t.timestamp ? new Date(t.timestamp) : (t.date ? new Date(t.date) : null);
+      if (!tDate || isNaN(tDate.getTime())) return;
+      var tDateStr = t.date || (tDate ? tDate.toISOString().split("T")[0] : "");
       
       if (tDateStr === todayStr) {
         revenueToday += Number(t.grandTotal || 0);
@@ -294,24 +304,59 @@ function getProdukData() {
 }
 
 function getRiwayatData(limit) {
-  var trans = getRowsData("Transaksi");
-  var detailTrans = getRowsData("Detail Transaksi");
+  var trans = getRowsData("Transaksi") || [];
+  var detailTrans = getRowsData("Detail Transaksi") || [];
   
-  // Sort descending by timestamp
-  trans.sort(function(a, b) {
-    return new Date(b.timestamp) - new Date(a.timestamp);
-  });
-  
-  if (limit) {
-    trans = trans.slice(0, limit);
-  }
-  
-  // Attach detail items
+  // Attach detail items to current Transaksi
   trans.forEach(function(t) {
     t.items = detailTrans.filter(function(d) {
       return String(d.invoiceNumber) === String(t.invoiceNumber);
     });
   });
+
+  // Check if old "Riwayat" sheet exists and merge older rows
+  try {
+    var ss = getDb();
+    var riwayatSheet = ss.getSheetByName("Riwayat");
+    if (riwayatSheet) {
+      var riwayatRows = getRowsData("Riwayat") || [];
+      riwayatRows.forEach(function(r) {
+        // Prevent duplicate entries by checking invoiceNumber
+        var alreadyExists = trans.some(function(t) {
+          return String(t.invoiceNumber) === String(r.invoiceNumber);
+        });
+        
+        if (!alreadyExists) {
+          // Parse items from itemsJson if present in the old format
+          var items = [];
+          if (r.itemsJson) {
+            try {
+              items = JSON.parse(r.itemsJson);
+            } catch(e) {
+              // Best effort array parse or leave empty
+            }
+          }
+          r.items = items;
+          trans.push(r);
+        }
+      });
+    }
+  } catch(e) {
+    // Gracefully continue if old sheet fetch errors
+  }
+  
+  // Sort descending by timestamp / date safely to prevent NaN comparison issues
+  trans.sort(function(a, b) {
+    var dateB = b.timestamp ? new Date(b.timestamp) : (b.date ? new Date(b.date) : new Date(0));
+    var dateA = a.timestamp ? new Date(a.timestamp) : (a.date ? new Date(a.date) : new Date(0));
+    var timeB = isNaN(dateB.getTime()) ? 0 : dateB.getTime();
+    var timeA = isNaN(dateA.getTime()) ? 0 : dateA.getTime();
+    return timeB - timeA;
+  });
+  
+  if (limit) {
+    trans = trans.slice(0, limit);
+  }
   
   return trans;
 }
