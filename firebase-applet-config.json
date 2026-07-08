@@ -1,10 +1,23 @@
-{
-  "projectId": "model-timer-l4dh4",
-  "appId": "1:515183424289:web:de3e85675b74f449a04460",
-  "apiKey": "AIzaSyDg7qCkSpyRagulxgL7T9z-fRw1da4kDoU",
-  "authDomain": "model-timer-l4dh4.firebaseapp.com",
-  "firestoreDatabaseId": "ai-studio-billiardposaccou-451541ca-02fc-4ee2-9390-4c9141d0f018",
-  "storageBucket": "model-timer-l4dh4.firebasestorage.app",
-  "messagingSenderId": "515183424289",
-  "measurementId": ""
-}
+
+
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyAkMs0ObDyoaQEzii-CaQEJiZBosDsOsQA",
+  authDomain: "cool-parity-378809.firebaseapp.com",
+  projectId: "cool-parity-378809",
+  storageBucket: "cool-parity-378809.firebasestorage.app",
+  messagingSenderId: "267541321121",
+  appId: "1:267541321121:web:8e91df5cbb2fb27ea727e0",
+  measurementId: "G-5F28BQTXCF"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
