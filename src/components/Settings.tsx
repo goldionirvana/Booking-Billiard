@@ -53,7 +53,7 @@ export default function Settings({ settings, userRole, onUpdateSettings, onShowN
       {/* Title */}
       <div>
         <h1 className="text-2xl font-bold text-white tracking-tight">Pengaturan Sistem Billiard</h1>
-        <p className="text-slate-400 text-sm">Atur parameter perpajakan, diskon bawaan, info kuitansi, dan sinkronisasi database Firebase Cloud.</p>
+        <p className="text-slate-400 text-sm">Atur parameter perpajakan, diskon bawaan, info kuitansi, dan sinkronisasi database Supabase PostgreSQL.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -121,10 +121,10 @@ export default function Settings({ settings, userRole, onUpdateSettings, onShowN
               </div>
             </div>
 
-            {/* Firebase Integration Section */}
+            {/* Supabase Integration Section */}
             <h2 className="text-xs font-bold text-emerald-400 uppercase tracking-widest border-b border-slate-700 pt-4 pb-2 mb-2 flex items-center gap-1.5">
               <Database className="w-4 h-4" />
-              <span>Integrasi Firebase Cloud</span>
+              <span>Integrasi Supabase Cloud Database</span>
             </h2>
 
             <div className="p-4 bg-slate-900 rounded-xl border border-slate-750 space-y-4">
@@ -132,10 +132,10 @@ export default function Settings({ settings, userRole, onUpdateSettings, onShowN
                 <div className="space-y-1">
                   <span className="text-[11px] font-bold text-emerald-400 flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    Database Firebase Aktif & Terhubung
+                    Database Supabase Aktif & Terhubung
                   </span>
                   <p className="text-[10px] text-slate-400 leading-normal">
-                    Seluruh data transaksi, data produk, daftar meja, pengeluaran kas, dan log audit keamanan Anda disimpan dengan aman dan dicadangkan secara real-time di server Firebase Cloud.
+                    Seluruh data transaksi, data produk, daftar meja, pengeluaran kas, dan log audit keamanan Anda disimpan dengan aman dan dicadangkan secara real-time di server Supabase PostgreSQL.
                   </p>
                 </div>
               </div>
@@ -163,10 +163,10 @@ export default function Settings({ settings, userRole, onUpdateSettings, onShowN
                     className="w-full py-3 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 hover:border-indigo-500/50 font-bold rounded-xl text-xs transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                   >
                     <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? "animate-spin" : ""}`} />
-                    <span>Sinkronkan Ulang dengan Firebase Cloud</span>
+                    <span>Sinkronkan Ulang dengan Supabase Cloud</span>
                   </button>
                   <p className="text-[10px] text-slate-500 text-center mt-1.5 leading-normal">
-                    Mengunduh dan memperbarui seluruh data Meja, Produk, Transaksi, dan Pengeluaran terbaru dari server Firebase ke memori lokal browser Anda.
+                    Mengunduh dan memperbarui seluruh data Meja, Produk, Transaksi, dan Pengeluaran terbaru dari server Supabase ke memori lokal browser Anda.
                   </p>
                 </div>
               )}
@@ -198,7 +198,7 @@ export default function Settings({ settings, userRole, onUpdateSettings, onShowN
             <div className="space-y-3">
               <div className="bg-slate-900/60 p-3 rounded-xl border border-slate-750">
                 <span className="font-bold text-white block mb-1">Penyimpanan Cloud</span>
-                <p className="text-[11px]">Setiap kali kasir membuka meja, melakukan transaksi checkout, atau menambah pengeluaran kas, data langsung tersimpan di Firebase Cloud.</p>
+                <p className="text-[11px]">Setiap kali kasir membuka meja, melakukan transaksi checkout, atau menambah pengeluaran kas, data langsung tersimpan di Supabase PostgreSQL.</p>
               </div>
 
               <div className="bg-slate-900/60 p-3 rounded-xl border border-slate-750">
@@ -218,7 +218,7 @@ export default function Settings({ settings, userRole, onUpdateSettings, onShowN
             </div>
 
             <p className="text-[10px] text-slate-500 italic">
-              *Aplikasi ini telah sepenuhnya menggunakan Firebase Cloud sebagai satu-satunya database utama yang aman dan tersinkronisasi.
+              *Aplikasi ini telah sepenuhnya menggunakan Supabase PostgreSQL sebagai satu-satunya database utama yang aman dan tersinkronisasi.
             </p>
           </div>
         </div>

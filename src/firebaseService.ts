@@ -1,176 +1,112 @@
-import { 
-  collection, 
-  doc, 
-  getDocs, 
-  setDoc, 
-  deleteDoc, 
-  getDocFromServer,
-  getDoc
-} from "firebase/firestore";
-import { db, auth } from "./firebase";
-import { Table, Product, Transaction, Expense, AuditLog, AppSetting } from "./types";
+import { Table, Product, Transaction, Expense, AuditLog } from "./types";
 
-export enum OperationType {
-  CREATE = 'create',
-  UPDATE = 'update',
-  DELETE = 'delete',
-  LIST = 'list',
-  GET = 'get',
-  WRITE = 'write',
-}
-
-export interface FirestoreErrorInfo {
-  error: string;
-  operationType: OperationType;
-  path: string | null;
-  authInfo: {
-    userId?: string | null;
-    email?: string | null;
-    emailVerified?: boolean | null;
-    isAnonymous?: boolean | null;
-    tenantId?: string | null;
-    providerInfo?: {
-      providerId?: string | null;
-      email?: string | null;
-    }[];
-  }
-}
-
-// Global error handler that conforms to the required IR schema
-export function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null): never {
-  const errInfo: FirestoreErrorInfo = {
-    error: error instanceof Error ? error.message : String(error),
-    authInfo: {
-      userId: auth.currentUser?.uid,
-      email: auth.currentUser?.email,
-      emailVerified: auth.currentUser?.emailVerified,
-      isAnonymous: auth.currentUser?.isAnonymous,
-      tenantId: auth.currentUser?.tenantId,
-      providerInfo: auth.currentUser?.providerData?.map(provider => ({
-        providerId: provider.providerId,
-        email: provider.email,
-      })) || []
-    },
-    operationType,
-    path
+async function getAuthHeaders() {
+  return {
+    "Content-Type": "application/json"
   };
-  console.error('Firestore Error: ', JSON.stringify(errInfo));
-  throw new Error(JSON.stringify(errInfo));
 }
 
-// Test Connection function as mandated by the skill
-export async function testConnection() {
+export async function testConnection(): Promise<boolean> {
   try {
-    await getDocFromServer(doc(db, 'test', 'connection'));
+    const headers = await getAuthHeaders();
+    const res = await fetch("/api/test-db", { headers });
+    return res.ok;
   } catch (error) {
-    if (error instanceof Error && error.message.includes('the client is offline')) {
-      console.error("Please check your Firebase configuration.");
-    }
+    console.error("Gagal menghubungkan ke SQL Server:", error);
+    return false;
   }
 }
 
-// Core Operations
 export async function fetchTablesFromFirebase(): Promise<Table[]> {
-  const path = "tables";
-  try {
-    const snap = await getDocs(collection(db, path));
-    return snap.docs.map(d => ({ id: d.id, ...d.data() } as Table));
-  } catch (err) {
-    handleFirestoreError(err, OperationType.LIST, path);
-  }
+  const headers = await getAuthHeaders();
+  const res = await fetch("/api/tables", { headers });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
 }
 
 export async function fetchProductsFromFirebase(): Promise<Product[]> {
-  const path = "products";
-  try {
-    const snap = await getDocs(collection(db, path));
-    return snap.docs.map(d => ({ id: d.id, ...d.data() } as Product));
-  } catch (err) {
-    handleFirestoreError(err, OperationType.LIST, path);
-  }
+  const headers = await getAuthHeaders();
+  const res = await fetch("/api/products", { headers });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
 }
 
 export async function fetchTransactionsFromFirebase(): Promise<Transaction[]> {
-  const path = "transactions";
-  try {
-    const snap = await getDocs(collection(db, path));
-    return snap.docs.map(d => ({ invoiceNumber: d.id, ...d.data() } as Transaction));
-  } catch (err) {
-    handleFirestoreError(err, OperationType.LIST, path);
-  }
+  const headers = await getAuthHeaders();
+  const res = await fetch("/api/transactions", { headers });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
 }
 
 export async function fetchExpensesFromFirebase(): Promise<Expense[]> {
-  const path = "expenses";
-  try {
-    const snap = await getDocs(collection(db, path));
-    return snap.docs.map(d => ({ id: d.id, ...d.data() } as Expense));
-  } catch (err) {
-    handleFirestoreError(err, OperationType.LIST, path);
-  }
+  const headers = await getAuthHeaders();
+  const res = await fetch("/api/expenses", { headers });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
 }
 
 export async function fetchAuditLogsFromFirebase(): Promise<AuditLog[]> {
-  const path = "auditLogs";
-  try {
-    const snap = await getDocs(collection(db, path));
-    return snap.docs.map(d => ({ id: d.id, ...d.data() } as AuditLog));
-  } catch (err) {
-    handleFirestoreError(err, OperationType.LIST, path);
-  }
+  const headers = await getAuthHeaders();
+  const res = await fetch("/api/audit-logs", { headers });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
 }
 
-// Writers
 export async function saveTableToFirebase(table: Table): Promise<void> {
-  const path = `tables/${table.id}`;
-  try {
-    await setDoc(doc(db, "tables", table.id), table);
-  } catch (err) {
-    handleFirestoreError(err, OperationType.WRITE, path);
-  }
+  const headers = await getAuthHeaders();
+  const res = await fetch("/api/tables", {
+    method: "POST",
+    headers,
+    body: JSON.stringify(table)
+  });
+  if (!res.ok) throw new Error(await res.text());
 }
 
 export async function saveProductToFirebase(product: Product): Promise<void> {
-  const path = `products/${product.id}`;
-  try {
-    await setDoc(doc(db, "products", product.id), product);
-  } catch (err) {
-    handleFirestoreError(err, OperationType.WRITE, path);
-  }
+  const headers = await getAuthHeaders();
+  const res = await fetch("/api/products", {
+    method: "POST",
+    headers,
+    body: JSON.stringify(product)
+  });
+  if (!res.ok) throw new Error(await res.text());
 }
 
 export async function saveTransactionToFirebase(transaction: Transaction): Promise<void> {
-  const path = `transactions/${transaction.invoiceNumber}`;
-  try {
-    await setDoc(doc(db, "transactions", transaction.invoiceNumber), transaction);
-  } catch (err) {
-    handleFirestoreError(err, OperationType.WRITE, path);
-  }
+  const headers = await getAuthHeaders();
+  const res = await fetch("/api/transactions", {
+    method: "POST",
+    headers,
+    body: JSON.stringify(transaction)
+  });
+  if (!res.ok) throw new Error(await res.text());
 }
 
 export async function saveExpenseToFirebase(expense: Expense): Promise<void> {
-  const path = `expenses/${expense.id}`;
-  try {
-    await setDoc(doc(db, "expenses", expense.id), expense);
-  } catch (err) {
-    handleFirestoreError(err, OperationType.WRITE, path);
-  }
+  const headers = await getAuthHeaders();
+  const res = await fetch("/api/expenses", {
+    method: "POST",
+    headers,
+    body: JSON.stringify(expense)
+  });
+  if (!res.ok) throw new Error(await res.text());
 }
 
 export async function deleteExpenseFromFirebase(id: string): Promise<void> {
-  const path = `expenses/${id}`;
-  try {
-    await deleteDoc(doc(db, "expenses", id));
-  } catch (err) {
-    handleFirestoreError(err, OperationType.WRITE, path);
-  }
+  const headers = await getAuthHeaders();
+  const res = await fetch(`/api/expenses/${id}`, {
+    method: "DELETE",
+    headers
+  });
+  if (!res.ok) throw new Error(await res.text());
 }
 
 export async function saveAuditLogToFirebase(log: AuditLog): Promise<void> {
-  const path = `auditLogs/${log.id}`;
-  try {
-    await setDoc(doc(db, "auditLogs", log.id), log);
-  } catch (err) {
-    handleFirestoreError(err, OperationType.WRITE, path);
-  }
+  const headers = await getAuthHeaders();
+  const res = await fetch("/api/audit-logs", {
+    method: "POST",
+    headers,
+    body: JSON.stringify(log)
+  });
+  if (!res.ok) throw new Error(await res.text());
 }

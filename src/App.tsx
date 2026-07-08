@@ -54,6 +54,7 @@ export default function App() {
   // System States
   const [isLoading, setIsLoading] = useState(false);
   const [realTimeClock, setRealTimeClock] = useState(new Date());
+  const [isCloudConnected, setIsCloudConnected] = useState<boolean>(false);
 
   // Toast Notifications State
   const [notification, setNotification] = useState<{ msg: string; type: "success" | "error" | "info" } | null>(null);
@@ -136,7 +137,7 @@ export default function App() {
     }
   }, []);
 
-  // Fetch full data from Firebase Cloud when logged in
+  // Fetch full data from Supabase Cloud when logged in
   useEffect(() => {
     if (session) {
       fetchFirebaseData();
@@ -146,8 +147,15 @@ export default function App() {
   const fetchFirebaseData = async () => {
     setIsLoading(true);
     try {
-      showNotification("Menghubungkan ke Firebase Cloud...", "info");
-      await testConnection();
+      showNotification("Menghubungkan ke Supabase Cloud...", "info");
+      const connected = await testConnection();
+      if (!connected) {
+        setIsCloudConnected(false);
+        showNotification("Gagal sinkron Supabase. Menggunakan mode cache lokal (Offline).", "info");
+        setIsLoading(false);
+        return;
+      }
+      setIsCloudConnected(true);
       const fbTables = await fetchTablesFromFirebase();
       const fbProducts = await fetchProductsFromFirebase();
       const fbTransactions = await fetchTransactionsFromFirebase();
@@ -226,9 +234,10 @@ export default function App() {
         }
       }
 
-      showNotification("Database Firebase Cloud berhasil disinkronkan!", "success");
+      showNotification("Database Supabase Cloud berhasil disinkronkan!", "success");
     } catch (err: any) {
-      console.error("Gagal sinkron Firebase:", err);
+      console.error("Gagal sinkron Supabase:", err);
+      setIsCloudConnected(false);
       let detailedMessage = "Menggunakan cache lokal.";
       try {
         const errorObj = JSON.parse(err.message);
@@ -262,8 +271,10 @@ export default function App() {
     setAuditLogs(updatedLogs);
     localStorage.setItem("billiard_logs", JSON.stringify(updatedLogs));
 
-    // Save to Firebase
-    saveAuditLogToFirebase(newLog).catch(console.error);
+    // Save to Database Cloud (Supabase)
+    if (isCloudConnected) {
+      saveAuditLogToFirebase(newLog).catch(console.error);
+    }
   };
 
   // =========================================================
@@ -313,46 +324,52 @@ export default function App() {
     setTables(updatedTables);
     localStorage.setItem("billiard_tables", JSON.stringify(updatedTables));
 
-    // Handle Firebase Sync
-    updatedTables.forEach((t) => {
-      const prev = tables.find((p) => p.id === t.id);
-      if (JSON.stringify(prev) !== JSON.stringify(t)) {
-        saveTableToFirebase(t).catch(console.error);
-      }
-    });
+    // Handle Supabase Sync
+    if (isCloudConnected) {
+      updatedTables.forEach((t) => {
+        const prev = tables.find((p) => p.id === t.id);
+        if (JSON.stringify(prev) !== JSON.stringify(t)) {
+          saveTableToFirebase(t).catch(console.error);
+        }
+      });
+    }
   };
 
   const handleUpdateProducts = (updatedProducts: Product[]) => {
     setProducts(updatedProducts);
     localStorage.setItem("billiard_products", JSON.stringify(updatedProducts));
 
-    // Handle Firebase Sync
-    updatedProducts.forEach((p) => {
-      const prev = products.find((pr) => pr.id === p.id);
-      if (JSON.stringify(prev) !== JSON.stringify(p)) {
-        saveProductToFirebase(p).catch(console.error);
-      }
-    });
+    // Handle Supabase Sync
+    if (isCloudConnected) {
+      updatedProducts.forEach((p) => {
+        const prev = products.find((pr) => pr.id === p.id);
+        if (JSON.stringify(prev) !== JSON.stringify(p)) {
+          saveProductToFirebase(p).catch(console.error);
+        }
+      });
+    }
   };
 
   const handleUpdateExpenses = (updatedExpenses: Expense[]) => {
     setExpenses(updatedExpenses);
     localStorage.setItem("billiard_expenses", JSON.stringify(updatedExpenses));
 
-    // Handle Firebase Sync (find deleted or updated)
-    if (updatedExpenses.length < expenses.length) {
-      expenses.forEach((e) => {
-        if (!updatedExpenses.some((un) => un.id === e.id)) {
-          deleteExpenseFromFirebase(e.id).catch(console.error);
-        }
-      });
-    } else {
-      updatedExpenses.forEach((e) => {
-        const prev = expenses.find((ex) => ex.id === e.id);
-        if (JSON.stringify(prev) !== JSON.stringify(e)) {
-          saveExpenseToFirebase(e).catch(console.error);
-        }
-      });
+    // Handle Supabase Sync (find deleted or updated)
+    if (isCloudConnected) {
+      if (updatedExpenses.length < expenses.length) {
+        expenses.forEach((e) => {
+          if (!updatedExpenses.some((un) => un.id === e.id)) {
+            deleteExpenseFromFirebase(e.id).catch(console.error);
+          }
+        });
+      } else {
+        updatedExpenses.forEach((e) => {
+          const prev = expenses.find((ex) => ex.id === e.id);
+          if (JSON.stringify(prev) !== JSON.stringify(e)) {
+            saveExpenseToFirebase(e).catch(console.error);
+          }
+        });
+      }
     }
   };
 
@@ -361,8 +378,10 @@ export default function App() {
     setTransactions(updatedTrans);
     localStorage.setItem("billiard_transactions", JSON.stringify(updatedTrans));
 
-    // Handle Firebase Sync
-    saveTransactionToFirebase(newTrans).catch(console.error);
+    // Handle Supabase Sync
+    if (isCloudConnected) {
+      saveTransactionToFirebase(newTrans).catch(console.error);
+    }
 
     // Audit logs for checkout / start playing
     if (newTrans.status === "Aktif") {
@@ -580,14 +599,20 @@ export default function App() {
                 onClick={fetchFirebaseData}
                 disabled={isLoading}
                 className="px-3 py-1 rounded-full bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50 text-[10px] font-bold"
-                title="Sinkronisasi Database Firebase Cloud"
+                title="Sinkronisasi Database Supabase PostgreSQL"
               >
                 <RefreshCw className={`w-3 h-3 ${isLoading ? "animate-spin" : ""}`} />
                 <span>Sync Cloud</span>
               </button>
-              <span className="px-3 py-1 rounded-full text-[10px] font-semibold border bg-indigo-500/10 text-indigo-400 border-indigo-500/20">
-                Cloud Connected
-              </span>
+              {isCloudConnected ? (
+                <span className="px-3 py-1 rounded-full text-[10px] font-semibold border bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
+                  Supabase Connected
+                </span>
+              ) : (
+                <span className="px-3 py-1 rounded-full text-[10px] font-semibold border bg-rose-500/10 text-rose-400 border-rose-500/20" title="Silakan cek konfigurasi database PostgreSQL Anda.">
+                  Offline Fallback
+                </span>
+              )}
             </div>
           </div>
 
