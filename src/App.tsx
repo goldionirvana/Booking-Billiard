@@ -229,7 +229,18 @@ export default function App() {
       showNotification("Database Firebase Cloud berhasil disinkronkan!", "success");
     } catch (err: any) {
       console.error("Gagal sinkron Firebase:", err);
-      showNotification("Gagal membaca dari Firebase Cloud. Menggunakan cache lokal.", "error");
+      let detailedMessage = "Menggunakan cache lokal.";
+      try {
+        const errorObj = JSON.parse(err.message);
+        if (errorObj && errorObj.error) {
+          detailedMessage = `${errorObj.error}`;
+        }
+      } catch (e) {
+        if (err.message) {
+          detailedMessage = err.message;
+        }
+      }
+      showNotification(`Gagal sinkron: ${detailedMessage} (Menggunakan cache lokal)`, "error");
     } finally {
       setIsLoading(false);
     }

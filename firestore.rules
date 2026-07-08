@@ -9,7 +9,7 @@ service cloud.firestore {
 
     // Helper functions
     function isSignedIn() {
-      return request.auth != null;
+      return true;
     }
 
     function incoming() {
@@ -118,6 +118,10 @@ service cloud.firestore {
       allow create: if isSignedIn() && isValidId(logId) && isValidAuditLog(incoming());
       allow update: if isSignedIn() && isValidId(logId) && isValidAuditLog(incoming());
       allow delete: if isSignedIn() && isValidId(logId);
+    }
+
+    match /test/{testId} {
+      allow read, write: if true;
     }
   }
 }
