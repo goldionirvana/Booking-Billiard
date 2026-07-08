@@ -124,9 +124,7 @@ export async function fetchAuditLogsFromFirebase(): Promise<AuditLog[]> {
 export async function saveTableToFirebase(table: Table): Promise<void> {
   const path = `tables/${table.id}`;
   try {
-    // Exclude 'id' field from document body as it is the doc id
-    const { id, ...data } = table;
-    await setDoc(doc(db, "tables", table.id), data);
+    await setDoc(doc(db, "tables", table.id), table);
   } catch (err) {
     handleFirestoreError(err, OperationType.WRITE, path);
   }
@@ -135,8 +133,7 @@ export async function saveTableToFirebase(table: Table): Promise<void> {
 export async function saveProductToFirebase(product: Product): Promise<void> {
   const path = `products/${product.id}`;
   try {
-    const { id, ...data } = product;
-    await setDoc(doc(db, "products", product.id), data);
+    await setDoc(doc(db, "products", product.id), product);
   } catch (err) {
     handleFirestoreError(err, OperationType.WRITE, path);
   }
@@ -145,8 +142,7 @@ export async function saveProductToFirebase(product: Product): Promise<void> {
 export async function saveTransactionToFirebase(transaction: Transaction): Promise<void> {
   const path = `transactions/${transaction.invoiceNumber}`;
   try {
-    const { invoiceNumber, ...data } = transaction;
-    await setDoc(doc(db, "transactions", transaction.invoiceNumber), data);
+    await setDoc(doc(db, "transactions", transaction.invoiceNumber), transaction);
   } catch (err) {
     handleFirestoreError(err, OperationType.WRITE, path);
   }
@@ -155,8 +151,7 @@ export async function saveTransactionToFirebase(transaction: Transaction): Promi
 export async function saveExpenseToFirebase(expense: Expense): Promise<void> {
   const path = `expenses/${expense.id}`;
   try {
-    const { id, ...data } = expense;
-    await setDoc(doc(db, "expenses", expense.id), data);
+    await setDoc(doc(db, "expenses", expense.id), expense);
   } catch (err) {
     handleFirestoreError(err, OperationType.WRITE, path);
   }
@@ -174,8 +169,7 @@ export async function deleteExpenseFromFirebase(id: string): Promise<void> {
 export async function saveAuditLogToFirebase(log: AuditLog): Promise<void> {
   const path = `auditLogs/${log.id}`;
   try {
-    const { id, ...data } = log;
-    await setDoc(doc(db, "auditLogs", log.id), data);
+    await setDoc(doc(db, "auditLogs", log.id), log);
   } catch (err) {
     handleFirestoreError(err, OperationType.WRITE, path);
   }
